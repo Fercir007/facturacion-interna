@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ContratoController;
+use App\Http\Controllers\ProductoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PeriodoFacturacionController;
+use App\Http\Controllers\FacturaController;
 
 // Redirige la raíz al dashboard o al login
 Route::get('/', function () {
@@ -27,6 +31,7 @@ Route::middleware('guest')->group(function () {
 
         return back()->withErrors(['email' => 'Las credenciales no son correctas.'])->onlyInput('email');
     });
+    
 });
 
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
@@ -38,5 +43,12 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 
 // App — protegido por auth
 Route::middleware('auth')->group(function () {
+    Route::resource('productos', ProductoController::class);
     Route::resource('clientes', ClienteController::class);
+    Route::resource('clientes.contratos', ContratoController::class)->scoped();
+    Route::resource('clientes.periodos', PeriodoFacturacionController::class)
+        ->scoped()
+        ->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::get('clientes/{cliente}/periodos/{periodo}/factura', [FacturaController::class, 'show'])
+        ->name('clientes.periodos.factura');
 });

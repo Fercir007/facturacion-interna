@@ -20,30 +20,13 @@ WORKDIR /app
 
 COPY composer.json composer.lock ./
 
-ARG APP_ENV=production
-
-RUN if [ "$APP_ENV" = "production" ]; then \
-        composer install \
-            --no-dev \
-            --no-interaction \
-            --no-plugins \
-            --no-scripts \
-            --prefer-dist \
-            --optimize-autoloader \
-            --ignore-platform-reqs; \
-    else \
-        composer install \
-            --no-interaction \
-            --prefer-dist \
-            --ignore-platform-reqs; \
-    fi
-#RUN composer install \
-#    --no-dev \
-#    --no-interaction \
-#    --no-plugins \
-#    --no-scripts \
-#    --prefer-dist \
-#    --optimize-autoloader
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader
 
 # ============================================================
 # Stage 3 — Imagen final (Nginx + PHP-FPM)
@@ -73,12 +56,12 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 
 WORKDIR /var/www
 
-# Copiar vendor y assets compilados de los stages anteriores
+# 1. Copiar código fuente primero
+COPY . .
+
+# 2. Pisar vendor y assets con los compilados correctamente en los stages anteriores
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
-
-# Copiar el código fuente
-COPY . .
 
 # Permisos correctos
 RUN chown -R www-data:www-data storage bootstrap/cache \

@@ -25,7 +25,11 @@
                                   {{ request()->routeIs('clientes.*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                             Clientes
                         </a>
-                        {{-- Acá se van a ir agregando: Facturas, Contratos, etc. --}}
+                        <a href="{{ route('productos.index') }}"
+                           class="inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2
+                                  {{ request()->routeIs('productos.*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                            Productos
+                        </a>
                     </div>
                 </div>
 

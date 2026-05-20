@@ -13,3 +13,4 @@ tests/
 docker-compose*.yml
 .editorconfig
 .phpunit*
+public/build

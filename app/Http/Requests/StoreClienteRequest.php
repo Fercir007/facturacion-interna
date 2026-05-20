@@ -16,10 +16,10 @@ class StoreClienteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tipo_cliente'     => ['required', Rule::enum(TipoCliente::class)],
-            'razon_social'     => ['required', 'string', 'max:255'],
-            'nombre_comercial' => ['nullable', 'string', 'max:255'],
-            'cuit' => [
+            'tipo_cliente'       => ['required', Rule::enum(TipoCliente::class)],
+            'razon_social'       => ['required', 'string', 'max:255'],
+            'nombre_comercial'   => ['nullable', 'string', 'max:255'],
+            'cuit'               => [
                 'required', 'string', 'size:11', 'regex:/^\d{11}$/',
                 function (string $attribute, mixed $value, \Closure $fail) {
                     $exists = \App\Models\Cliente::where('cuit', $value)->exists();
@@ -28,21 +28,25 @@ class StoreClienteRequest extends FormRequest
                     }
                 },
             ],
-            'referente'        => ['nullable', 'string', 'max:255'],
-            'email'            => ['nullable', 'email', 'max:255'],
-            'telefono'         => ['nullable', 'string', 'max:50'],
-            'notes'            => ['nullable', 'string'],
-            'activo'           => ['sometimes', 'boolean'],
+            'email'              => ['nullable', 'email', 'max:255'],
+            'telefono'           => ['nullable', 'string', 'max:50'],
+            'notes'              => ['nullable', 'string'],
+            'activo'             => ['sometimes', 'boolean'],
+            'referentes'         => ['nullable', 'array'],
+            'referentes.*.nombre'    => ['required_with:referentes', 'string', 'max:255'],
+            'referentes.*.email'     => ['nullable', 'email', 'max:255'],
+            'referentes.*.telefono'  => ['nullable', 'string', 'max:50'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'cuit.unique'           => 'Ya existe un cliente con ese CUIT.',
-            'cuit.size'             => 'El CUIT debe tener exactamente 11 dígitos sin guiones.',
-            'cuit.regex'            => 'El CUIT solo puede contener números.',
-            'razon_social.required' => 'La razón social es obligatoria.',
+            'cuit.size'                      => 'El CUIT debe tener exactamente 11 dígitos sin guiones.',
+            'cuit.regex'                     => 'El CUIT solo puede contener números.',
+            'razon_social.required'          => 'La razón social es obligatoria.',
+            'referentes.*.nombre.required_with' => 'El nombre del referente es obligatorio.',
+            'referentes.*.email.email'       => 'El email del referente no es válido.',
         ];
     }
 }

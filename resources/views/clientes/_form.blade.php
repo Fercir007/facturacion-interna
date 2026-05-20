@@ -48,25 +48,98 @@
     </div>
 </div>
 
-{{-- Referente + Email --}}
+{{-- Email --}}
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     <div>
-        <label for="referente" class="block text-sm font-medium text-gray-700">Referente</label>
-        <input type="text" name="referente" id="referente"
-               value="{{ old('referente', $cliente->referente ?? '') }}"
-               placeholder="Nombre y apellido del contacto"
-               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        @error('referente')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-    </div>
-
-    <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
         <input type="email" name="email" id="email"
                value="{{ old('email', $cliente->email ?? '') }}"
                class="mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
                       {{ $errors->has('email') ? 'border-red-300' : 'border-gray-300' }}">
         @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+    </div>
+
+    <div>
+        <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+        <input type="text" name="telefono" id="telefono"
+               value="{{ old('telefono', $cliente->telefono ?? '') }}"
+               placeholder="+54 11 1234-5678"
+               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm
+                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        @error('telefono')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+    </div>
+</div>
+
+{{-- Referentes --}}
+<div x-data="{
+    referentes: {{ json_encode(
+        old('referentes',
+            isset($cliente) && $cliente->referentes->isNotEmpty()
+                ? $cliente->referentes->map(fn($r) => [
+                    'nombre'   => $r->nombre,
+                    'email'    => $r->email ?? '',
+                    'telefono' => $r->telefono ?? '',
+                  ])->values()->toArray()
+                : [['nombre' => '', 'email' => '', 'telefono' => '']]
+        )
+    ) }}
+}">
+    <div class="flex items-center justify-between mb-2">
+        <label class="block text-sm font-medium text-gray-700">Referentes</label>
+        <button type="button"
+                @click="referentes.push({ nombre: '', email: '', telefono: '' })"
+                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer">
+            + Agregar referente
+        </button>
+    </div>
+
+    <div class="space-y-3">
+        <template x-for="(ref, index) in referentes" :key="index">
+            <div class="border border-gray-200 rounded-md p-4 bg-gray-50 relative">
+
+                <span x-show="index === 0"
+                      class="absolute top-3 right-3 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
+                    Principal
+                </span>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 pr-24">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+                        <input type="text"
+                               :name="`referentes[${index}][nombre]`"
+                               x-model="ref.nombre"
+                               placeholder="Nombre y apellido"
+                               class="block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+                        <input type="email"
+                               :name="`referentes[${index}][email]`"
+                               x-model="ref.email"
+                               placeholder="contacto@empresa.com"
+                               class="block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
+                        <input type="text"
+                               :name="`referentes[${index}][telefono]`"
+                               x-model="ref.telefono"
+                               placeholder="+54 11 1234-5678"
+                               class="block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <button type="button"
+                        x-show="index !== 0"
+                        @click="referentes.splice(index, 1)"
+                        class="absolute bottom-3 right-3 text-xs text-red-400 hover:text-red-600 cursor-pointer">
+                    Quitar
+                </button>
+            </div>
+        </template>
     </div>
 </div>
 
